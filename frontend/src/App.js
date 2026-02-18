@@ -16,7 +16,7 @@ function App() {
 
   const handleConvert = async () => {
     if (!file) return;
-    
+
     setLoading(true);
     const formData = new FormData();
     formData.append('file', file);
@@ -27,36 +27,60 @@ function App() {
         body: formData,
       });
       const data = await res.json();
-      setMarkdown(data.markdown || data.error);
+      setMarkdown(data.markdown || data.error || '');
     } catch (err) {
       setMarkdown('Error: ' + err.message);
     }
     setLoading(false);
   };
 
+  const handleDownload = () => {
+    if (!markdown) return;
+
+    const baseName = file?.name ? file.name.replace(/\.[^/.]+$/, '') : 'converted';
+    const mdFileName = `${baseName}.md`;
+
+    const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = mdFileName;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <Container maxWidth="md" sx={{ mt: 4 }}>
       <Typography variant="h4" gutterBottom>Document to Markdown</Typography>
-      
+
       <Box sx={{ mb: 3 }}>
-        <Button
-          variant="contained"
-          component="label"
-          startIcon={<CloudUpload />}
-        >
+        <Button variant="contained" component="label" startIcon={<CloudUpload />}>
           Choose File
           <input type="file" hidden onChange={handleFileChange} />
         </Button>
         {file && <Typography sx={{ mt: 1 }}>{file.name}</Typography>}
       </Box>
 
-      <Button 
-        variant="contained" 
-        onClick={handleConvert} 
+      <Button
+        variant="contained"
+        onClick={handleConvert}
         disabled={!file || loading}
-        sx={{ mb: 3 }}
+        sx={{ mb: 2, mr: 2 }}
       >
         {loading ? <CircularProgress size={24} /> : 'Convert'}
+      </Button>
+
+      <Button
+        variant="outlined"
+        onClick={handleDownload}
+        disabled={!markdown || loading}
+        sx={{ mb: 3 }}
+      >
+        Download .md
       </Button>
 
       {markdown && (
