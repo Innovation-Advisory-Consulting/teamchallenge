@@ -6,6 +6,7 @@ on:
 
 permissions:
   contents: read
+  id-token: write
 
 env:
   AZURE_RESOURCE_GROUP: InnovationAdvisory
@@ -31,6 +32,10 @@ jobs:
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_RBAC_CREDENTIALS }}
+
+      - name: Ensure containerapp extension
+        run: |
+          az extension add --name containerapp --upgrade
 
       - name: Update Container App
         run: |
