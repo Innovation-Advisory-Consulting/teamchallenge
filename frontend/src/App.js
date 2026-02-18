@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Container, Box, Button, Typography, Paper, CircularProgress } from '@mui/material';
 import { CloudUpload } from '@mui/icons-material';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+const API_URL = process.env.REACT_APP_API_URL || 'https://mark-down-container.jollymeadow-0111d26b.westus2.azurecontainerapps.io';
 
 function App() {
   const [file, setFile] = useState(null);
@@ -80,7 +80,7 @@ function App() {
         disabled={!markdown || loading}
         sx={{ mb: 3 }}
       >
-        Download .md
+        Download .md test
       </Button>
 
       {markdown && (
