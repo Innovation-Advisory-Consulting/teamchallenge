@@ -10,7 +10,7 @@ permissions:
 
 env:
   AZURE_RESOURCE_GROUP: InnovationAdvisory
-  CONTAINERAPP_NAME: markdowncontainer
+  CONTAINERAPP_NAME: mark-down-container
   ACR_LOGIN_SERVER: tradarchacr01.azurecr.io
   IMAGE_NAME: tradarch-backend
 
