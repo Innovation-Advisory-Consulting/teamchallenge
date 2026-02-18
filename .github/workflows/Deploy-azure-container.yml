@@ -1,0 +1,44 @@
+name: Deploy to Azure Container Apps
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'backend/**'
+
+permissions:
+  contents: read
+
+env:
+  AZURE_RESOURCE_GROUP: InnovationAdvisory
+  CONTAINERAPP_NAME: markdowncontainer
+  ACR_NAME: tradarchacr01
+  IMAGE_NAME: tradarch-backend
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_RBAC_CREDENTIALS }}
+
+      - name: Build & Push image to ACR
+        run: |
+          az acr build \
+            --registry $ACR_NAME \
+            --image $IMAGE_NAME:${{ github.sha }} \
+            ./backend
+
+      - name: Update Container App to new image
+        run: |
+          az containerapp update \
+            --name $CONTAINERAPP_NAME \
+            --resource-group $AZURE_RESOURCE_GROUP \
+            --image $ACR_NAME.azurecr.io/$IMAGE_NAME:${{ github.sha }}
