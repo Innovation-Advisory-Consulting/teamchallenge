@@ -6,10 +6,11 @@ on:
 
 permissions:
   contents: read
+  id-token: write
 
 env:
   AZURE_RESOURCE_GROUP: InnovationAdvisory
-  CONTAINERAPP_NAME: markdowncontainer
+  CONTAINERAPP_NAME: mark-down-container
   ACR_LOGIN_SERVER: tradarchacr01.azurecr.io
   IMAGE_NAME: tradarch-backend
 
@@ -31,6 +32,11 @@ jobs:
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_RBAC_CREDENTIALS }}
+          allow-no-subscriptions: true
+          
+      - name: Ensure containerapp extension
+        run: |
+          az extension add --name containerapp --upgrade
 
       - name: Update Container App
         run: |
