@@ -1,35 +1,36 @@
 import React, { useState } from 'react';
-import {
-  Container, Box, Button, Typography, Paper, CircularProgress,
-  CssBaseline,
-} from '@mui/material';
+import { Box, Button, Typography, CircularProgress, CssBaseline } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { CloudUpload, FileDownload, AutoAwesome } from '@mui/icons-material';
 
 const theme = createTheme({
   palette: {
-    mode: 'dark',
-    primary: { main: '#2196F3' },
-    background: { default: '#0d1117', paper: '#161b22' },
-    text: { primary: '#e6edf3', secondary: '#8b949e' },
+    mode: 'light',
+    primary: { main: '#0ea5e9' },
+    background: { default: '#f0f9ff', paper: '#ffffff' },
+    text: { primary: '#0f172a', secondary: '#64748b' },
   },
   typography: { fontFamily: '"Inter", "Roboto", sans-serif' },
-  shape: { borderRadius: 12 },
+  shape: { borderRadius: 16 },
   components: {
     MuiButton: {
       styleOverrides: {
-        root: {
-          textTransform: 'none',
-          fontWeight: 600,
-          padding: '10px 24px',
-          borderRadius: 10,
-        },
+        root: { textTransform: 'none', fontWeight: 600, borderRadius: 12 },
       },
     },
   },
 });
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://mark-down-container.jollymeadow-0111d26b.westus2.azurecontainerapps.io';
+
+const glassStyle = {
+  background: 'rgba(255, 255, 255, 0.72)',
+  backdropFilter: 'blur(20px)',
+  WebkitBackdropFilter: 'blur(20px)',
+  border: '1px solid rgba(14, 165, 233, 0.15)',
+  borderRadius: 20,
+  boxShadow: '0 8px 32px rgba(14, 165, 233, 0.08)',
+};
 
 function App() {
   const [file, setFile] = useState(null);
@@ -46,10 +47,7 @@ function App() {
     e.preventDefault();
     setDragging(false);
     const dropped = e.dataTransfer.files[0];
-    if (dropped) {
-      setFile(dropped);
-      setMarkdown('');
-    }
+    if (dropped) { setFile(dropped); setMarkdown(''); }
   };
 
   const handleConvert = async () => {
@@ -84,194 +82,219 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
+
+      {/* Light gradient background */}
       <Box
         sx={{
           minHeight: '100vh',
-          bgcolor: 'background.default',
+          background: 'linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 40%, #ecfeff 100%)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          py: 6,
+          p: 3,
+          position: 'relative',
+          overflow: 'hidden',
         }}
       >
-        <Container maxWidth="md">
+        {/* Decorative blobs */}
+        <Box sx={{
+          position: 'absolute', top: '-8%', left: '-4%',
+          width: 450, height: 450, borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(14,165,233,0.18) 0%, transparent 70%)',
+          pointerEvents: 'none',
+        }} />
+        <Box sx={{
+          position: 'absolute', bottom: '-8%', right: '-4%',
+          width: 500, height: 500, borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(6,182,212,0.15) 0%, transparent 70%)',
+          pointerEvents: 'none',
+        }} />
+        <Box sx={{
+          position: 'absolute', top: '40%', right: '10%',
+          width: 250, height: 250, borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(56,189,248,0.12) 0%, transparent 70%)',
+          pointerEvents: 'none',
+        }} />
+
+        {/* Main glass card */}
+        <Box sx={{ ...glassStyle, p: 4, width: '100%', maxWidth: 580, position: 'relative', zIndex: 1 }}>
+
           {/* Header */}
-          <Box sx={{ textAlign: 'center', mb: 5 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 1 }}>
-              <AutoAwesome sx={{ color: '#2196F3', fontSize: 28 }} />
-              <Typography
-                variant="h4"
-                fontWeight={700}
-                sx={{
-                  background: 'linear-gradient(135deg, #2196F3 0%, #64B5F6 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                }}
-              >
-                Document to Markdown
-              </Typography>
+          <Box sx={{ textAlign: 'center', mb: 4 }}>
+            <Box sx={{
+              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+              width: 60, height: 60, borderRadius: '18px', mb: 2,
+              background: 'linear-gradient(135deg, #0ea5e9, #06b6d4)',
+              boxShadow: '0 8px 20px rgba(14,165,233,0.3)',
+            }}>
+              <AutoAwesome sx={{ color: '#fff', fontSize: 28 }} />
             </Box>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="h4" fontWeight={700} sx={{ color: '#0f172a', mb: 0.5 }}>
+              Document to Markdown
+            </Typography>
+            <Typography variant="body2" sx={{ color: '#64748b' }}>
               Convert your documents to clean Markdown in seconds
             </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+            <Typography variant="body2" sx={{ color: '#94a3b8', mt: 0.5 }}>
               Supports PDF, DOCX, PPTX and more — powered by Azure AI
             </Typography>
           </Box>
 
-          {/* Main Card */}
-          <Paper
-            elevation={0}
+          {/* Drop zone */}
+          <Box
+            onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+            onDragLeave={() => setDragging(false)}
+            onDrop={handleDrop}
             sx={{
+              border: `2px dashed ${dragging ? '#0ea5e9' : '#bae6fd'}`,
+              borderRadius: '16px',
               p: 4,
-              border: '1px solid rgba(255,255,255,0.08)',
-              borderRadius: 3,
-              bgcolor: 'background.paper',
+              mb: 3,
+              textAlign: 'center',
+              background: dragging ? 'rgba(14,165,233,0.06)' : 'rgba(240,249,255,0.8)',
+              transition: 'all 0.25s ease',
+              cursor: 'pointer',
             }}
           >
-            {/* Drop Zone */}
-            <Box
-              onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
-              onDragLeave={() => setDragging(false)}
-              onDrop={handleDrop}
+            <Box sx={{
+              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+              width: 52, height: 52, borderRadius: '14px', mb: 1.5,
+              background: 'linear-gradient(135deg, rgba(14,165,233,0.12), rgba(6,182,212,0.12))',
+              border: '1px solid rgba(14,165,233,0.2)',
+            }}>
+              <CloudUpload sx={{ color: '#0ea5e9', fontSize: 24 }} />
+            </Box>
+            <Typography variant="body1" fontWeight={600} sx={{ color: '#0f172a', mb: 0.5 }}>
+              {file ? file.name : 'Drop your file here'}
+            </Typography>
+            <Typography variant="body2" sx={{ color: '#64748b', mb: 2 }}>
+              {file ? 'Ready to convert' : 'or click to browse your files'}
+            </Typography>
+            <Button
+              component="label"
+              size="small"
               sx={{
-                border: `2px dashed ${dragging ? '#2196F3' : 'rgba(255,255,255,0.15)'}`,
-                borderRadius: 2,
-                p: 4,
-                mb: 3,
-                textAlign: 'center',
-                bgcolor: dragging ? 'rgba(33,150,243,0.06)' : 'rgba(255,255,255,0.02)',
-                transition: 'all 0.2s ease',
-                cursor: 'pointer',
+                background: 'rgba(14,165,233,0.08)',
+                color: '#0ea5e9',
+                border: '1px solid rgba(14,165,233,0.25)',
+                px: 2.5, py: 0.75,
+                borderRadius: '10px',
+                fontSize: '0.8rem',
+                fontWeight: 600,
+                '&:hover': { background: 'rgba(14,165,233,0.15)' },
               }}
             >
-              <CloudUpload sx={{ fontSize: 40, color: '#2196F3', mb: 1.5, opacity: 0.85 }} />
-              <Typography variant="body1" fontWeight={500} sx={{ mb: 0.5 }}>
-                Drop your file here
-              </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                PDF, DOCX, PPTX and more — or click to browse
-              </Typography>
-              <Button
-                variant="outlined"
-                component="label"
-                size="small"
-                sx={{ borderColor: 'rgba(33,150,243,0.5)', color: '#2196F3' }}
-              >
-                Browse file
-                <input type="file" hidden onChange={handleFileChange} />
-              </Button>
+              Browse
+              <input type="file" hidden onChange={handleFileChange} />
+            </Button>
+          </Box>
 
-              {file && (
-                <Box
-                  sx={{
-                    mt: 2,
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 1,
-                    bgcolor: 'rgba(33,150,243,0.1)',
-                    border: '1px solid rgba(33,150,243,0.3)',
-                    borderRadius: 2,
-                    px: 2,
-                    py: 0.75,
-                  }}
-                >
-                  <Typography variant="body2" color="primary" fontWeight={500}>
-                    {file.name}
-                  </Typography>
-                </Box>
-              )}
-            </Box>
+          {/* Action buttons */}
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <Button
+              fullWidth
+              variant="contained"
+              onClick={handleConvert}
+              disabled={!file || loading}
+              disableElevation
+              sx={{
+                py: 1.5,
+                background: 'linear-gradient(135deg, #0ea5e9, #06b6d4)',
+                color: '#fff',
+                fontWeight: 700,
+                '&:hover': {
+                  background: 'linear-gradient(135deg, #0284c7, #0891b2)',
+                  boxShadow: '0 8px 24px rgba(14,165,233,0.35)',
+                },
+                '&:disabled': {
+                  background: '#e2e8f0',
+                  color: '#94a3b8',
+                },
+              }}
+            >
+              {loading ? <CircularProgress size={20} sx={{ color: '#0ea5e9' }} /> : 'Convert'}
+            </Button>
 
-            {/* Action Buttons */}
-            <Box sx={{ display: 'flex', gap: 2 }}>
-              <Button
-                variant="contained"
-                onClick={handleConvert}
-                disabled={!file || loading}
-                disableElevation
-                sx={{
-                  bgcolor: '#2196F3',
-                  '&:hover': { bgcolor: '#42A5F5' },
-                  '&:disabled': { bgcolor: 'rgba(33,150,243,0.2)', color: 'rgba(255,255,255,0.3)' },
-                  minWidth: 140,
-                }}
-              >
-                {loading ? <CircularProgress size={20} sx={{ color: '#fff' }} /> : 'Convert'}
-              </Button>
-
-              <Button
-                variant="outlined"
-                startIcon={<FileDownload />}
-                onClick={handleDownload}
-                disabled={!markdown || loading}
-                sx={{
-                  borderColor: 'rgba(255,255,255,0.15)',
-                  color: 'text.primary',
-                  '&:hover': { borderColor: '#2196F3', color: '#2196F3' },
-                  '&:disabled': { borderColor: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.2)' },
-                }}
-              >
-                Download .md
-              </Button>
-            </Box>
-          </Paper>
+            <Button
+              fullWidth
+              startIcon={<FileDownload />}
+              onClick={handleDownload}
+              disabled={!markdown || loading}
+              sx={{
+                py: 1.5,
+                background: '#fff',
+                color: '#0f172a',
+                border: '1px solid #e2e8f0',
+                fontWeight: 600,
+                '&:hover': {
+                  background: '#f8fafc',
+                  borderColor: '#0ea5e9',
+                  color: '#0ea5e9',
+                },
+                '&:disabled': {
+                  background: '#f8fafc',
+                  color: '#cbd5e1',
+                  borderColor: '#f1f5f9',
+                },
+              }}
+            >
+              Download .md
+            </Button>
+          </Box>
 
           {/* Result */}
           {markdown && (
-            <Paper
-              elevation={0}
-              sx={{
-                mt: 3,
-                border: '1px solid rgba(255,255,255,0.08)',
-                borderRadius: 3,
+            <Box sx={{ mt: 3 }}>
+              <Box sx={{
+                background: '#fff',
+                border: '1px solid #e2e8f0',
+                borderRadius: '16px',
                 overflow: 'hidden',
-                bgcolor: 'background.paper',
-              }}
-            >
-              <Box
-                sx={{
-                  px: 3,
-                  py: 1.5,
-                  borderBottom: '1px solid rgba(255,255,255,0.06)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1,
-                }}
-              >
-                <Typography variant="body2" fontWeight={600} color="text.secondary">
-                  Result
-                </Typography>
-                <Box sx={{ flex: 1 }} />
-                <Typography variant="caption" color="text.secondary">
-                  {markdown.split('\n').length} lines
-                </Typography>
+                boxShadow: '0 2px 12px rgba(14,165,233,0.06)',
+              }}>
+                <Box sx={{
+                  px: 2.5, py: 1.5,
+                  borderBottom: '1px solid #f1f5f9',
+                  display: 'flex', alignItems: 'center',
+                  background: '#f8fafc',
+                }}>
+                  <Box sx={{ display: 'flex', gap: 0.75, mr: 2 }}>
+                    {['#ff5f57', '#febc2e', '#28c840'].map(c => (
+                      <Box key={c} sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: c }} />
+                    ))}
+                  </Box>
+                  <Typography variant="caption" sx={{ color: '#64748b', fontFamily: 'monospace' }}>
+                    output.md
+                  </Typography>
+                  <Box sx={{ flex: 1 }} />
+                  <Typography variant="caption" sx={{ color: '#94a3b8' }}>
+                    {markdown.split('\n').length} lines
+                  </Typography>
+                </Box>
+                <Box
+                  component="pre"
+                  sx={{
+                    m: 0, p: 2.5,
+                    background: '#ffffff',
+                    color: '#1e293b',
+                    fontFamily: '"JetBrains Mono", "Fira Code", "Consolas", monospace',
+                    fontSize: '0.8rem',
+                    lineHeight: 1.75,
+                    whiteSpace: 'pre-wrap',
+                    wordWrap: 'break-word',
+                    maxHeight: 400,
+                    overflowY: 'auto',
+                    '&::-webkit-scrollbar': { width: 5 },
+                    '&::-webkit-scrollbar-track': { bgcolor: 'transparent' },
+                    '&::-webkit-scrollbar-thumb': { bgcolor: '#cbd5e1', borderRadius: 3 },
+                  }}
+                >
+                  {markdown}
+                </Box>
               </Box>
-              <Box
-                component="pre"
-                sx={{
-                  m: 0,
-                  p: 3,
-                  bgcolor: '#0d1117',
-                  color: '#e6edf3',
-                  fontFamily: '"JetBrains Mono", "Fira Code", "Consolas", monospace',
-                  fontSize: '0.82rem',
-                  lineHeight: 1.7,
-                  whiteSpace: 'pre-wrap',
-                  wordWrap: 'break-word',
-                  maxHeight: 480,
-                  overflowY: 'auto',
-                  '&::-webkit-scrollbar': { width: 6 },
-                  '&::-webkit-scrollbar-track': { bgcolor: 'transparent' },
-                  '&::-webkit-scrollbar-thumb': { bgcolor: 'rgba(255,255,255,0.1)', borderRadius: 3 },
-                }}
-              >
-                {markdown}
-              </Box>
-            </Paper>
+            </Box>
           )}
-        </Container>
+        </Box>
       </Box>
     </ThemeProvider>
   );
